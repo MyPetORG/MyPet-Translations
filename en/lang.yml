@@ -1,0 +1,164 @@
+MyPet:
+  Message:
+    addbeacon: '%aqua%%petname%%reset% can now now use these buffs (range: %range%
+      - duration: %duration%sec):'
+    addbehavior: '%aqua%%petname%%reset% can now now use these behavior modes:'
+    addcontrol: '%aqua%%petname%%reset% can now be controlled with a %item%.'
+    adddamage: '%aqua%%petname%%reset% has now %dmg% bonusdamage.'
+    addhp: '%aqua%%petname%%reset% has now a max health of %maxhealth%HP.'
+    addhpreg: '%aqua%%petname%%reset% regenerates now %hp%HP every %sec%sec.'
+    addleash: '%green%You take your pet on the leash, he''ll be a good pet.'
+    addpickup: '%aqua%%petname%%reset% now can pickup items in a range of %range%.'
+    addride: '%aqua%%petname%%reset% can now be ridden.'
+    alreadyaway: '%aqua%%petname%%reset% is not here.'
+    automaticskilltreeassignment: Skilltrees will be assigned automatically!
+    availableskilltrees: 'Available skilltrees for %aqua%%petname%%reset%:'
+    beaconwhileincreative: You can't open the beacon window while you are in creative mode.
+    beaconbuffnotactive: You %red%can't%reset% use the %gold%%buff%%reset% buff.
+    beaconimprovedbuffnotactive: You %red%can't%reset% use the improved %gold%%buff%%reset% buff.
+    behaviorstate: '%aqua%%petname%%reset% is now in %mode% mode.'
+    call: '%aqua%%petname%%reset% comes to you.'
+    callwhendead: '%aqua%%petname%%reset% is %red%dead%reset% and will respawn in
+      %gold%%time%%reset% sec.'
+    callfirst: You must call %aqua%%petname%%reset% first.
+    cantfindskilltree: There is not skilltree available that is labeled %name%.
+    cantuse: '%red%You can not use this now.'
+    petinfo: ' [player] | Display info about a MyPet  (alias: /pinfo)'
+    petname: ' <new pet name> | Set the name of your pet'
+    petrelease: ' <petname> | Release your pet'
+    petstop: ' | MyPet stopps attacking  (alias: /ps or /pets)'
+    petcall: ' | Call your pet  (alias: /pc or /petc)'
+    petsendaway: ' | Sends your pet away  (alias: /psa or /petsa)'
+    petskill: ' | Shows the skill-levels'
+    petchooseskilltree: ' | Shows and chooses skilltrees  (alias: /pcst or /petcst)'
+    petinventory: ' | Opens the inventory of the pet  (alias: /pi or /peti)'
+    petpickup: ' | Toggle pickup on/off  (alias: /pp or /petp)'
+    petbehavior: ' | Toggles the behaivior  (alias: /pb or /petb)'
+    moreinfo: 'For more info read the command page on: '
+    petadmin: ' [PlayerName] name/exp/respawn [Value]'
+    controlaggrofarm: You can't control %aqua%%petname%%reset% when in %mode% mode!
+    deathmessage: '%aqua%%petname%%reset% was killed by: '
+    despawn: '%aqua%%petname%%reset% despawned.'
+    donthavepet: You don't have a MyPet!
+    firechance: '%aqua%%petname%%reset% has now a chance of %chance%% to set enemies
+      on fire for %duration%sec.'
+    hpinfo: '%aqua%%petname%%reset% HP:%hp%'
+    inventory: '%aqua%%petname%%reset% has now an inventory with %size%slots.'
+    inventorywhileincreative: You can't open the inventory while you are in creative mode.
+    inventorywhileswimming: You can't open the inventory while %aqua%%petname%%reset% is swimming!
+    knockbackchance: '%aqua%%petname%%reset% has now a chance of %chance%% to knock
+      his target back.'
+    learnskill: '%aqua%%petname%%reset% learned the skill %skill%.'
+    lightningchance: '%aqua%%petname%%reset% has now a chance of %chance%% to shoot
+      a lightning at his enemies.'
+    lvlup: '%aqua%%petname%%reset% is now Lv%lvl%'
+    name: 'The name of your pet is: %aqua%%petname%'
+    newname: 'The name of your pet is now: %aqua%%petname%'
+    noinventory: '%aqua%%petname%%reset% doesn''t have an inventory.'
+    noskill: '%aqua%%petname%%reset% doesn''t know the skill %skill%.'
+    onlychooseskilltreeonce: You can change the skilltree of %aqua%%petname%%reset% only once!
+    onrespawn: '%aqua%%petname%%reset% respawned!'
+    petisgone: '%aqua%%petname%%reset% is %red%gone%reset% and will never come back
+      . . .'
+    pickupbutnoinventory: '%aqua%%petname%%reset% could pickup items but has no inventoy.'
+    pickupstart: '%aqua%%petname%%reset% pickup: activated'
+    pickupstop: '%aqua%%petname%%reset% pickup: disabled'
+    poisonchance: '%aqua%%petname%%reset% has now a chance of %chance%% to poison
+      his target for %duration%sec.'
+    release: '%aqua%%petname%%reset% is now %green%free%reset% . . .'
+    respawnauto: 'Auto respawn: %gold%%status%%reset%.'
+    respawnautomin: Set minimal auto respawn time to %gold%%time%%reset%.
+    respawnin: '%aqua%%petname%%reset% will respawn in %gold%%time%%reset% sec.'
+    respawnnomoney: You need %red%%costs%%reset% to let respawn %aqua%%petname%%reset%!
+    respawnpaid: Respawn fee (%gold%%costs%%reset%) for %aqua%%petname%%reset% paid.
+    respawnshow: 'Respawn fee for %aqua%%petname%%reset%: %gold%%costs%%reset% (%color%auto%reset%)'
+    sendaway: You sent %aqua%%petname%%reset% away.
+    skills: '%aqua%%petname%%reset%''s skills: %skilltree%'
+    skilltreesnotwitched: Skilltree hasn't changed!
+    skilltreeswitchedto: You have selected the %aqua%%name%%reset% skilltree.
+    slowchance: '%aqua%%petname%%reset% has now a chance of %chance%% to slow target
+      down for %duration%sec.'
+    spawnnospace: '%aqua%%petname%%reset% can not come to you because there is not
+      enough space.'
+    spawnprevent: Something prevents %aqua%%petname%%reset% from coming to you.
+    stopattack: Your pet should now %green%stop%reset% attacking!
+    thornschance: '%aqua%%petname%%reset% has now a chance of %chance%% to reflect
+      damage.'
+    userdonthavepet: '%gold%%playername%%reset% doesn''t have a MyPet!'
+    witherchance: '%aqua%%petname%%reset% has now a chance of %chance%% to wither
+      his target for %duration%sec.'
+  Name:
+    Aggressive: Aggressive
+    Arrow: Arrow
+    Bat: Bat
+    Blaze: Blaze
+    Blocks: Block(s)
+    CaveSpider: Cave Spider
+    Chicken: Chicken
+    Contact: Contact
+    Cow: Cow
+    Creeper: Creeper
+    Damage: Damage
+    Dead: Dead
+    Disabled: Disabled
+    Drowning: Drowning
+    Egg: Egg
+    Enabled: Enabled
+    EnderDragon: Ender Dragon
+    Enderman: Enderman
+    Exp: Exp
+    Fall: Fall
+    FallingBlock: Falling Block
+    Farm: Farm
+    Fire: Fire
+    Fireball: Fireball
+    Fireworks: Fireworks
+    FishingHook: Fishing Hook
+    Friendly: Friendly
+    Ghast: Ghast
+    Haste: Haste
+    Help: Help
+    HP: HP
+    Hunger: Hunger
+    JumpBoost: Jump Boost
+    Lava: Lava
+    MagmaCube: Magma Cube
+    Level: Level
+    Lightning: Lightning
+    Magic: Magic
+    Modes: Modes
+    Mooshroom: Mooshroom
+    Normal: Normal
+    Owner: Owner
+    Ocelot: Ocelot
+    Pig: Pig
+    ZombiePigman: Zombie Pigman
+    Poison: Poison
+    TnT: TnT
+    Raid: Raid
+    Range: Range
+    Regeneration: Regeneration
+    Resistance: Resistance
+    Rows: Row(s)
+    Sheep: Sheep
+    Silverfish: Silverfish
+    Skeleton: Skeleton
+    Slime: Slime
+    Snowball: Snowball
+    SnowMan: Snowman
+    Speed: Speed
+    Spider: Spider
+    SplashPotion: Splash Potion
+    Squid: Squid
+    Strength: Strength
+    Tier: Tier
+    Unknow: Unknow
+    Villager: Villager
+    IronGolem: Iron Golem
+    Void: The Void
+    Witch: Witch
+    Wither: Wither
+    WitherSkull: Witherskull
+    Wolf: Wolf
+    You: You
+    Zombie: Zombie
