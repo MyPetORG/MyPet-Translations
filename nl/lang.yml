@@ -1,0 +1,117 @@
+#           Made by blokzeil1 (www.crafters.nl)
+MyPet:
+  Message:
+    addleash: '%green%Je doet je huisdier aan de lijn. Hij zal braaf zijn.'
+    lvlup: '%aqua%%petname%%white% is nu level%lvl%'
+    hpinfo: '%aqua%%petname%%white% HP:%hp%'
+    inventory: '%aqua%%petname%%white% heeft nu een inventory van %size%slots.'
+    addcontrol: '%aqua%%petname%%white% kan nu in bedwang gehouden worden met %item%'
+    controlaggrofarm: Je kunt %aqua%%petname%%white% niet in bedwang houden in %mode% mode!
+    addride: Op %aqua%%petname%%white% kan nu worden gereden
+    addpickup: '%aqua%%petname%%white% kan nu items oppakken in een gebied van %range%.'
+    addhpreg: '%aqua%%petname%%white% maakt nu HP elke %sec%sec% seconden'
+    addhp: '%aqua%%petname%%white% heeft nu een maximum health van%maxhealth%HP'
+    adddamage: '%aqua%%petname%%white% heeft nu %dmg% bonusdamage'
+    petisgone: '%aqua%%petname%%white% is %red%weggelopen%white% en zal nooit meer
+      terugkomen'
+    deathmessage: '%aqua%%petname%%white% is  door: '
+    respawnin: '%aqua%%petname%%white% respawn in %gold%%time%%white% sec'
+    onrespawn: '%aqua%%petname%%white% respawned'
+    callwhendead: '%aqua%%petname%%white% is %red%overleden%white% en zal respawnen
+      in %gold%%time%%white% sec'
+    call: '%aqua%%petname%%white% komt naar je toe.'
+    spawnnospace: '%aqua%%petname%%white% kan niet naar je toekomen omdat er te weinig
+      ruimte is.'
+    despawn: '%aqua%%petname%%white% despawned.'
+    sendaway: Je stuurde %aqua%%petname%%white% weg
+    alreadyaway: '%aqua%%petname%%white% is niet hier.'
+    callfirst: Je moet eerst %aqua%%petname%%white% roepen
+    userdonthavepet: '%gold%%playername%%white% Heeft geen MyPet!'
+    donthavepet: 'Je hebt geen MyPet! '
+    newname: 'Je MyPet heet nu: %aqua%%petname%'
+    name: 'Je MyPet heet: %aqua%%petname%'
+    release: '%aqua%%petname%%white% is nu %green%vrijgelaten%white% . . .'
+    stopattack: Je huisdier zou nu moeten %green%ophouden met%white% aanvallen!
+    inventorywhileswimming: Je kunt de inventory niet openen als %aqua%%petname%%white% aan het zwemmen is!
+    inventorywhileincreative: Je kan je inventory niet openen terwijl je in creative bent.
+    noinventory: '%aqua%%petname%%white% heeft geen inventory.'
+    pickupbutnoinventory: '%aqua%%petname%%white% kon de items oppakken, maar heeft
+      geen inventory'
+    noskill: '%aqua%%petname%%white% kent de skill %skill% niet.'
+    skills: '%aqua%%petname%%white% skills: %skilltree%'
+    learnskill: '%aqua%%petname%%white% heeft de skill %skill% geleerd.'
+    pickupstop: '%aqua%%petname%%white% pickup: uit'
+    pickupstart: '%aqua%%petname%%white% pickup: aan'
+    behaviorstate: '%aqua%%petname%%white% is nu in %mode% modus.'
+    poisonchance: '%aqua%%petname%%white% heeft nu een kans van %chance%% om vijanden
+      te vergiftigen.'
+    firechance: '%aqua%%petname%%white% heeft nu een kans van%chance%% om vijanden
+      in brand te zetten.'
+    cantfindskilltree: 'Er is geen skilltree beschikbaar met de naam: %name%.'
+    availableskilltrees: 'Mogelijke skilltrees voor %aqua%%petname%%white%:'
+    skilltreeswitchedto: Je hebt de %aqua%%name%%white% skilltree geselecteerd.
+    skilltreesnotwitched: De skilltree is niet veranderd!
+    onlychooseskilltreeonce: Je kunt de skilltree van %aqua%%petname%%white% maar één keer veranderen!
+    automaticskilltreeassignment: De skilltrees worden automatisch toegediend!
+    thornschance: '%aqua%%petname%%white% heeft nu een kans van %chance%% om schade
+      te ontwijken.'
+    beaconwhileincreative: Je kan het beacon scherm niet openen terwijl je in creative bent.
+  Name:
+    HP: HP
+    Damage: Damage
+    Exp: Exp
+    Level: Level
+    Hunger: Honger
+    Owner: Eigenaar
+    Aggressive: Aggressief
+    Friendly: Vriendelijk
+    Farm: Farm
+    Normal: Normaal
+    Wolf: Wolf
+    Bat: Vleermuis
+    Chicken: Max
+    Cow: Koe
+    Mooshroom: Mooshroom
+    Ocelot: Ocelot
+    Pig: Blokzeil
+    Sheep: Schaap
+    Squid: Octopus
+    Villager: Villager
+    Enderman: Enderman
+    ZombiePigman: Zombie Pigman
+    Blaze: Blaze
+    CaveSpider: Cave Spider
+    Creeper: Creeper
+    Ghast: Ghast
+    MagmaCube: Magma Cube
+    Silverfish: Silverfish
+    Skeleton: Skeleton
+    Slime: Slime
+    Spider: Spin
+    Witch: Heks
+    Zombie: Zombie
+    SnowMan: Sneeuwman
+    IronGolem: Iron Golem
+    EnderDragon: Ender Dragon
+    Wither: Wither
+    WitherSkull: Witherskull
+    Snowball: Sneeuwbal
+    Arrow: Pijl
+    Fireball: Vuurbal
+    Fireworks: Vuurwerk
+    FishingHook: Vishaak
+    SplashPotion: Splash Potion
+    Egg: Ei
+    Fall: Val
+    TnT: TnT
+    You: Jij
+    Drowning: Verdrinkt
+    Fire: Vuur
+    Lava: Lava
+    Void: De kelder
+    Lightning: Bliksem
+    Poison: Vergif
+    Magic: Magie
+    FallingBlock: Vallend blokje
+    Contact: Contact
+    Unknow: Onbekend

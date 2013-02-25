@@ -1,0 +1,110 @@
+MyPet:
+  Message:
+    addleash: '%green%你牢牢的拴住了它，它会成为你的好宠物！'
+    lvlup: '%aqua%%petname%%white% 升级！ 现在等级：Lv%lvl%'
+    hpinfo: '%aqua%%petname%%white% HP:%hp%'
+    inventory: '%aqua%%petname%%white% 现在有 %size% 格容量的物品栏！'
+    addcontrol: '%aqua%%petname%%white% 现在能用 %item% 来控制'
+    controlaggrofarm: 你不能控制 %aqua%%petname%%white% ，它正处于 %mode% 模式！
+    addride: '%aqua%%petname%%white% 可以骑了！'
+    addpickup: '%aqua%%petname%%white% 现在可以自动拾取 %range% 格范围内的物品'
+    addhpreg: '%aqua%%petname%%white% 现在每 %sec%秒回复1点HP'
+    addhp: '%aqua%%petname%%white% 当前最大生命值： %maxhealth%HP'
+    adddamage: '%aqua%%petname%%white% 攻击时有 %dmg% 点额外伤害'
+    petisgone: '%aqua%%petname%%white% 它 %red%永远的离开了你%white% . . .'
+    deathmessage: '%aqua%%petname%%white% 的死因/凶手: '
+    respawnin: '%aqua%%petname%%white% 在 %gold%%time%%white% 秒后复活'
+    onrespawn: '%aqua%%petname%%white% 已复活'
+    callwhendead: '%aqua%%petname%%white% 已%red%死亡%white%， 它将会在 %gold%%time%%white%
+      秒后复活'
+    call: '%aqua%%petname%%white% 过来了！'
+    spawnnospace: '%aqua%%petname%%white% 不能过来， 你周围没有足够的空间。'
+    despawn: '%aqua%%petname%%white% 取消重生'
+    sendaway: 你把 %aqua%%petname%%white% 遣散了
+    alreadyaway: '%aqua%%petname%%white% 已经不在这了'
+    callfirst: 你必须先召唤 %aqua%%petname%%white% 过来
+    userdonthavepet: '%gold%%playername%%white% 还没有宠物！'
+    donthavepet: 你还没有宠物！
+    newname: '你宠物的新名字: %aqua%%petname%'
+    name: '你宠物的名字: %aqua%%petname%'
+    release: '%aqua%%petname%%white% 现在 %green%重获自由%white% . . .'
+    stopattack: 你的宠物现在 %green%停止%white% 攻击！
+    inventorywhileswimming: 你不能打开宠物物品栏， %aqua%%petname%%white% 正在游泳！
+    inventorywhileincreative: 你正处于创造模式， 无法打开宠物物品栏！
+    noinventory: '%aqua%%petname%%white% 还没有物品栏！'
+    pickupbutnoinventory: '%aqua%%petname%%white% 可以自动拾取， 但是还没有物品栏'
+    noskill: '%aqua%%petname%%white% 没有掌握技能： %skill%.'
+    skills: '%aqua%%petname%%white% 技能: %skilltree%'
+    learnskill: '%aqua%%petname%%white% 已学习技能： %skill%.'
+    pickupstop: '%aqua%%petname%%white% 自动拾取: 关闭'
+    pickupstart: '%aqua%%petname%%white% 自动拾取: 开启'
+    behaviorstate: '%aqua%%petname%%white% 现在是 %mode% 模式'
+    poisonchance: '%aqua%%petname%%white% 攻击时有 %chance%% 几率使敌人中毒'
+    cantfindskilltree: 没有可用的技能树： %name%
+    availableskilltrees: '%aqua%%petname%%white% 可用技能树:'
+    skilltreeswitchedto: 你已选择 %aqua%%name%%white% 技能树
+    skilltreesnotwitched: 技能树没有改变!
+    onlychooseskilltreeonce: 你只能改变一次 %aqua%%petname%%white% 的技能树！
+    thornschance: '%aqua%%petname%%white% 受到攻击时有 %chance%% 几率反射1/2伤害'
+    firechance: '%aqua%%petname%%white% 攻击时有 %chance%% 几率使目标
+      燃烧'
+    automaticskilltreeassignment: 技能树将被自动分配！
+  Name:
+    HP: HP
+    Damage: 攻击力
+    Exp: 经验值
+    Level: 等级
+    Hunger: 饱食度
+    Owner: 主人
+    Aggressive: 主动攻击
+    Friendly: 友好
+    Farm: 自动打怪
+    Normal: 普通
+    Wolf: 狼
+    Bat: 蝙蝠
+    Chicken: 鸡
+    Cow: 牛
+    Mooshroom: 哞菇
+    Ocelot: 豹猫
+    Pig: 猪
+    Sheep: 羊
+    Squid: 章鱼
+    Villager: 村民
+    Enderman: 末影人
+    ZombiePigman: 僵尸猪
+    Blaze: 烈焰人
+    CaveSpider: 洞穴蜘蛛
+    Creeper: 苦力怕
+    Ghast: 恶魂
+    MagmaCube: 熔岩怪
+    Silverfish: 蠹虫
+    Skeleton: 骷髅
+    Slime: 史莱姆
+    Spider: 蜘蛛
+    Witch: 巫婆
+    Zombie: 僵尸
+    SnowMan: 雪人
+    IronGolem: 铁傀儡
+    EnderDragon: 末影龙
+    Wither: 凋零
+    WitherSkull: 凋零骷髅
+    Snowball: 雪球
+    Arrow: 弓箭
+    Fireball: 火球
+    Fireworks: 烟花
+    FishingHook: 鱼钩
+    SplashPotion: 喷溅药水
+    Egg: 鸡蛋
+    Fall: 摔死
+    TnT: TNT炸死
+    You: 你
+    Drowning: 溺死
+    Fire: 烧死
+    Lava: 岩浆
+    Void: 掉入虚空
+    Lightning: 雷击
+    Poison: 药水
+    Magic: 魔法
+    FallingBlock: 掉落的方块
+    Contact: Contact
+    Unknow: 未知

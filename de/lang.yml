@@ -1,0 +1,56 @@
+MyPet:
+  Message:
+    addcontrol: '%aqua%%petname%%white% kann nun mit einem %item% kontrolliert werden'
+    adddemage: '%aqua%%petname%%white% verursacht nun %dmg% Bonusschaden'
+    addhp: '%aqua%%petname%%white% hat nun eine maximale Trefferpunktezahl von %maxhealth%TP'
+    addhpreg: '%aqua%%petname%%white% regeneriert nun alle %sec% Sekunden einen Trefferpunkt'
+    addleash: '%green%Du nimmst dein Tier an eine Leine. Er wird ein guter Begleiter
+      sein.'
+    addpickup: '%aqua%%petname%%white% kann nun Items in einem Radius von %range%
+      aufnehmen.'
+    addride: '%aqua%%petname%%white% kann nun geritten werden.'
+    alreadyaway: '%aqua%%petname%%white% ist nicht hier.'
+    behaviorstate: '%aqua%%petname%%white% ist nun im %mode% Modus.'
+    call: '%aqua%%petname%%white% Kommt zu dir.'
+    callfirst: Du musst %aqua%%petname%%white% zuerst rufen.
+    callwhendead: '%aqua%%petname%%white% ist %red%tot%white% und wird in %gold%%time%%white%
+      Sekunden neu spawnen'
+    controlaggrofarm: Du kannst %aqua%%petname%%white% nicht kontrollieren wenn dieser im %mode% Modus ist!
+    deathmessage: '%aqua%%petname%%white% wurde getöte durch: '
+    despawn: '%aqua%%petname%%white% ist despawnt.'
+    donthavepet: Du hast kein MyPet!
+    hpinfo: '%aqua%%petname%%white% TP:%hp%'
+    inventory: '%aqua%%petname%%white% hat nun ein Inventar mit %size% Plätzen.'
+    inventorywhileincreative: Du kannst das Inventar nicht öffnen während du im Creative Modus bist
+    inventorywhileswimming: Du kannst das Inventar nicht öffnen während %aqua%%petname%%white% schwimmt!
+    learnskill: '%aqua%%petname%%white% hat den Skill %skill% gelernt.'
+    lvlup: '%aqua%%petname%%white% ist nun Level %lvl%'
+    name: 'Der Name deines Begleiters lautet: %aqua%%petname%'
+    newname: 'Der Name des Begleiters ist nun: %aqua%%petname%'
+    noinventory: '%aqua%%petname%%white% hat kein Inventar.'
+    noskill: '%aqua%%petname%%white% kennt den Skill %skill% nicht.'
+    onrespawn: '%aqua%%petname%%white% ist respawnt'
+    petisgone: '%aqua%%petname%%white% ist %red%verschwunden%white% und wird nicht
+      wieder zurückkehren. . .'
+    pickupbutnoinventory: '%aqua%%petname%%white% kann Items aufnehmen, hat aber kein
+      Invenar.'
+    pickupstart: '%aqua%%petname%%white% Aufheben von Items: aktiviert'
+    pickupstop: '%aqua%%petname%%white% Aufheben von Items: deaktiviert'
+    poisonchance: '%aqua%%petname%%white% hat nun eine Chance von %chance%% um Gegner
+      zu vergiften'
+    release: '%aqua%%petname%%white% ist nun %green%frei%white% . . .'
+    respawnin: '%aqua%%petname%%white% respawnt in %gold%%time%%white% Sekunden'
+    sendaway: Du schickst %aqua%%petname%%white% weg.
+    skills: '%aqua%%petname%%white%s derzeitige Skills: %skilltree%'
+    spawnnospace: '%aqua%%petname%%white% kann nicht zu dir kommen, weil dort zu wenig
+      Platz ist.'
+    stopattack: Dein Tier sollte nun %green%aufhören%white% sein Ziel anzugreifen!
+    userdonthavepet: '%gold%%playername%%white% hat kein MyPet!'
+    cantfindskilltree: 'Es gibt keinen Skilltree mit dem namen: %name%'
+    availableskilltrees: 'Verfügbare Skilltrees für %aqua%%petname%%white%:'
+    skilltreeswitchedto: Du hast den %aqua%%name%%white% Skilltree gewählt.
+    skilltreesnotwitched: Skilltree wurde nicht geändert!
+    adddamage: '%aqua%%petname%%white% has now %dmg% bonusdamage'
+    onlychooseskilltreeonce: You can change the skilltree of %aqua%%petname%%white% only once!
+    thornschance: '%aqua%%petname%%white% has now a chance of %chance%% to reflect
+      damage'
