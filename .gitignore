@@ -1,0 +1,25 @@
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Eclipse
+/.classpath
+/.project
+/.settings
+
+# NetBeans
+/nbproject
+
+# vim
+.*.sw[a-p]
+
+# Mac
+/.DS_Store
+
+# Ant
+build.number
+
+# Maven
+/target
