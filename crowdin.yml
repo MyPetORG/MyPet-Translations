@@ -1,3 +1,5 @@
+commit_message: "update translations (%two_letters_code%)"
+
 files:
   - source: /MyPet_en.properties
     translation: /MyPet_%two_letters_code%.properties
