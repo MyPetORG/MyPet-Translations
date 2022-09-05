@@ -1,3 +1,3 @@
 files:
-  - source: /MyPet_*.properties
+  - source: /MyPet_en.properties
     translation: /MyPet_%two_letters_code%.properties
