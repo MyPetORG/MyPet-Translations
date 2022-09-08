@@ -1,4 +1,4 @@
-commit_message: update translations (%two_letters_code%)
+pull_request_labels: [ "crowdin" ]
 files:
   - source: /MyPet_en.properties
     translation: /MyPet_%locale_with_underscore%.properties
