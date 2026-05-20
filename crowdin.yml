@@ -1,4 +1,5 @@
-pull_request_labels: [ "crowdin" ]
+pull_request_labels:
+  - crowdin
 files:
   - source: /MyPet_en.properties
     translation: /MyPet_%locale_with_underscore%.properties
