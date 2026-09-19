@@ -1,0 +1,48 @@
+name: PR rules
+
+# Enforces the branch pipeline (staging -> alpha -> main): branch prefixes, commit format,
+# player-facing PR titles, [skip ci] on chores and the Siblings section (each named sibling branch
+# must have a PR into that repo's staging). The rules and their reasons live in
+# .github/scripts/pr_rules.py, identical in every MyPet repo. Make "PR rules / check" a required
+# status on staging, alpha and main so nothing merges past it.
+#
+# Secret SIBLINGS_TOKEN: a fine-grained token with read access to pull requests on all five MyPet
+# repos. Without it the check can only see public siblings (via GITHUB_TOKEN) and fails on
+# private ones with a message saying so.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+    branches: [staging, alpha, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-rules-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Test the rules themselves
+        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
+
+      - name: Check this PR
+        env:
+          # Passed through env, never interpolated into the script: a PR title or body is
+          # attacker-controlled text.
+          PR_BASE: ${{ github.event.pull_request.base.ref }}
+          PR_HEAD: ${{ github.event.pull_request.head.ref }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          SIBLINGS_TOKEN: ${{ secrets.SIBLINGS_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/pr_rules.py
