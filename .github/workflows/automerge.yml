@@ -13,4 +13,8 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           MERGE_LABELS: "crowdin"
-          MERGE_METHOD: "rebase"
+          # staging only accepts squash merges (branch pipeline); retry for a few minutes
+          # while the required "PR rules" check is still running.
+          MERGE_METHOD: "squash"
+          MERGE_RETRIES: "30"
+          MERGE_RETRY_SLEEP: "10000"
