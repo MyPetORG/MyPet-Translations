@@ -73,11 +73,17 @@ def is_player_facing(subject: str) -> bool:
     return SKIP_CI not in subject and not NON_PLAYER_FACING_SUBJECT.match(subject)
 
 
+# (next release version, files the PR changes); None where the repo computes no versions.
+Changelog = Optional[Tuple[str, List[str]]]
+
+
 def check(base: str, head: str, title: str, body: str, commits: List[Commit],
-          repo: str, sibling_problem: Optional[SiblingProblem] = None) -> List[str]:
+          repo: str, sibling_problem: Optional[SiblingProblem] = None,
+          changelog: Changelog = None) -> List[str]:
     """Every rule the PR breaks, as human-readable lines; empty when it passes.
 
     `sibling_problem` checks that a named sibling branch has its PR; None skips that lookup.
+    `changelog` enables the changelog rule (repos with .github/scripts/version.py); None skips it.
     """
     if base == "alpha":
         return [] if head in ("staging", "main") else [
@@ -89,7 +95,8 @@ def check(base: str, head: str, title: str, body: str, commits: List[Commit],
         if not re.fullmatch(r"hotfix/" + BRANCH_NAME, head):
             return [f"Only `alpha` (promotion) or a `hotfix/` branch may be merged into `main`, "
                     f"not `{head}`."]
-        return change_rules("hotfix", head, title, body, commits, repo, sibling_problem)
+        return change_rules("hotfix", head, title, body, commits, repo, sibling_problem,
+                            changelog)
     if base == "staging":
         if head == "alpha":
             return []
@@ -103,14 +110,34 @@ def check(base: str, head: str, title: str, body: str, commits: List[Commit],
         if not match:
             return [f"The branch `{head}` must start with `fix/`, `feature/` or `chore/` "
                     f"(lowercase, e.g. `fix/pet-drowning`)."]
-        return change_rules(match.group(1), head, title, body, commits, repo, sibling_problem)
+        return change_rules(match.group(1), head, title, body, commits, repo, sibling_problem,
+                            changelog)
     return []
 
 
 def change_rules(kind: str, head: str, title: str, body: str, commits: List[Commit],
-                 repo: str, sibling_problem: Optional[SiblingProblem]) -> List[str]:
+                 repo: str, sibling_problem: Optional[SiblingProblem],
+                 changelog: Changelog = None) -> List[str]:
     return (commit_rules(commits) + title_rules(kind, title)
-            + sibling_rules(head, body, repo, sibling_problem))
+            + sibling_rules(head, body, repo, sibling_problem)
+            + changelog_rules(kind, changelog))
+
+
+def changelog_rules(kind: str, changelog: Changelog) -> List[str]:
+    """A player-facing change must add its line to the next release's changelog.
+
+    The release notes are written in the PRs that make the changes, so a release never ships notes
+    written before its newest fix (and nothing has to write them afterwards). Chores are exempt:
+    they never appear in a changelog.
+    """
+    if changelog is None or kind == "chore":
+        return []
+    version, changed = changelog
+    path = f".github/changelogs/{version}.bbcode"
+    if path in changed:
+        return []
+    return [f"This PR must add its change to `{path}` (the next release's changelog; create it "
+            f"from the previous release's file if it doesn't exist yet). Chores are exempt."]
 
 
 def commit_rules(commits: List[Commit]) -> List[str]:
@@ -225,14 +252,40 @@ def commits_between(base_sha: str, head_sha: str) -> List[Commit]:
     return commits
 
 
+VERSION_SCRIPT = ".github/scripts/version.py"
+
+
+def changelog_context(base_sha: str, head_sha: str) -> Changelog:
+    """The next version (computed on the checked-out PR merge, tags included) and the PR's files.
+
+    None in repos without a version script — only MyPet4 versions its releases this way.
+    """
+    if not os.path.exists(VERSION_SCRIPT):
+        return None
+    result = subprocess.run([sys.executable, VERSION_SCRIPT, "next"], capture_output=True, text=True)
+    if result.returncode != 0 or not result.stdout.strip():
+        raise RuntimeError("Could not compute the next version for the changelog rule: "
+                           + (result.stderr.strip() or "version.py printed nothing") + " — the "
+                           "checkout needs full history with tags (fetch-depth: 0).")
+    changed = subprocess.run(["git", "diff", "--name-only", f"{base_sha}...{head_sha}"],
+                             check=True, capture_output=True, text=True).stdout.split()
+    return result.stdout.strip(), changed
+
+
 def main() -> int:
     env = os.environ
     get = github_get(token_from_env(env))
+    try:
+        changelog = changelog_context(env["PR_BASE_SHA"], env["PR_HEAD_SHA"])
+    except RuntimeError as problem:
+        print(f"::error::{problem}")
+        return 1
     errors = check(env["PR_BASE"], env["PR_HEAD"], env.get("PR_TITLE", ""),
                    env.get("PR_BODY", ""),
                    commits_between(env["PR_BASE_SHA"], env["PR_HEAD_SHA"]),
                    env.get("GITHUB_REPOSITORY", ""),
-                   lambda sibling, branch: sibling_pr_problem(sibling, branch, get))
+                   lambda sibling, branch: sibling_pr_problem(sibling, branch, get),
+                   changelog)
     for error in errors:
         print(f"::error::{error}")
     if not errors:

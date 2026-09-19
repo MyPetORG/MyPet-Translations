@@ -18,9 +18,9 @@ GOOD_COMMITS = [Commit("a1", "fix(pets): guard water damage for endermen", 1),
 
 
 def errors(base="staging", head="fix/drowning", title="Fixed Enderman pets taking damage in rain",
-           body=SIBLINGS_OK, commits=None, repo=REPO, sibling_problem=None):
+           body=SIBLINGS_OK, commits=None, repo=REPO, sibling_problem=None, changelog=None):
     return check(base, head, title, body, GOOD_COMMITS if commits is None else commits, repo,
-                 sibling_problem)
+                 sibling_problem, changelog)
 
 
 class BranchNames(unittest.TestCase):
@@ -144,6 +144,39 @@ class Crowdin(unittest.TestCase):
 
     def test_crowdin_branches_are_refused_into_main(self):
         self.assertTrue(errors(base="main", head="i18n_staging", title="x", body=""))
+
+
+class Changelog(unittest.TestCase):
+    """Where the repo computes versions (MyPet4), every player-facing PR edits the next changelog."""
+    NEXT = ("4.0.5", [".github/changelogs/4.0.5.bbcode", "plugin/src/Foo.java"])
+
+    def test_a_fix_that_edits_the_next_changelog_passes(self):
+        self.assertEqual([], errors(changelog=self.NEXT))
+
+    def test_a_fix_without_a_changelog_edit_fails_and_names_the_file(self):
+        errs = errors(changelog=("4.0.5", ["plugin/src/Foo.java"]))
+        self.assertTrue(any(".github/changelogs/4.0.5.bbcode" in e for e in errs), errs)
+
+    def test_editing_an_older_changelog_does_not_count(self):
+        self.assertTrue(errors(changelog=("4.0.5", [".github/changelogs/4.0.4.bbcode"])))
+
+    def test_features_and_hotfixes_need_it_too(self):
+        self.assertTrue(errors(head="feature/x", changelog=("4.0.5", [])))
+        self.assertTrue(errors(base="main", head="hotfix/crash", changelog=("4.0.5", [])))
+
+    def test_chores_dependabot_crowdin_and_promotions_are_exempt(self):
+        self.assertEqual([], errors(head="chore/harness", title="Updated the test harness [skip ci]",
+                                    changelog=("4.0.5", [])))
+        self.assertEqual([], errors(head="dependabot/gradle/x", title="chore(deps): Bump x", body="",
+                                    commits=[Commit("a", "chore(deps): bump x", 1)],
+                                    changelog=("4.0.5", [])))
+        self.assertEqual([], errors(head="i18n_staging", title="New Crowdin updates", body="",
+                                    commits=[], changelog=("4.0.5", [])))
+        self.assertEqual([], errors(base="alpha", head="staging", title="x", body="",
+                                    changelog=("4.0.5", [])))
+
+    def test_no_changelog_rule_where_the_repo_has_no_version_script(self):
+        self.assertEqual([], errors(changelog=None))
 
 
 class PlayerFacing(unittest.TestCase):
