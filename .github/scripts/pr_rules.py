@@ -345,13 +345,23 @@ def changelog_context(base_sha: str, head_sha: str) -> Changelog:
         return None
     result = subprocess.run([sys.executable, VERSION_SCRIPT, "next"], capture_output=True, text=True)
     if result.returncode != 0 or not result.stdout.strip():
+        stderr = result.stderr.strip() or "version.py printed nothing"
+        if result.returncode == 3:
+            advice = ("one version has both a changelog file and a changelog directory — "
+                      "remove one of them.")
+        else:
+            advice = "the checkout needs full history with tags (fetch-depth: 0)."
         raise RuntimeError("Could not compute the next version for the changelog rule: "
-                           + (result.stderr.strip() or "version.py printed nothing") + " — the "
-                           "checkout needs full history with tags (fetch-depth: 0).")
+                           + stderr + " — " + advice)
     version = result.stdout.strip()
     changed = subprocess.run(["git", "diff", "--name-only", f"{base_sha}...{head_sha}"],
                              check=True, capture_output=True, text=True).stdout.split()
-    entry = subprocess.run(["git", "ls-tree", head_sha, "--", f"{CHANGELOG_DIR}/{version}"],
+    # Check the directory-vs-file form at HEAD (the checked-out PR merge commit), the same
+    # ref version.py just read — not head_sha (the PR branch tip). A branch opened before
+    # the fragments migration landed on staging has no directory at its own tip, but merging
+    # it lands on a HEAD that does; checking head_sha would wrongly let it resurrect the
+    # single-file form instead of being told to write a fragment.
+    entry = subprocess.run(["git", "ls-tree", "HEAD", "--", f"{CHANGELOG_DIR}/{version}"],
                            check=True, capture_output=True, text=True).stdout
     directory = " tree " in entry
 
