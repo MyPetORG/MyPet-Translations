@@ -2,7 +2,8 @@
 """Tests for pr_rules.py. Run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'"""
 import unittest
 
-from pr_rules import Commit, check, is_player_facing, sibling_pr_problem, token_from_env
+from pr_rules import (ChangelogContext, Commit, check, fragment_name, is_player_facing,
+                      is_stack_layer, parse_fragment, sibling_pr_problem, token_from_env)
 
 REPO = "MyPetORG/MyPet4"
 SIBLINGS_OK = """Some description.
@@ -53,7 +54,52 @@ class BranchNames(unittest.TestCase):
         self.assertEqual([], errors(base="staging", head="alpha", title="anything", body=""))
 
     def test_other_base_branches_are_not_policed(self):
-        self.assertEqual([], errors(base="feature/big", head="whatever", title="x", body=""))
+        self.assertEqual([], errors(base="release-notes-draft", head="whatever", title="x",
+                                    body=""))
+
+
+class StackLayers(unittest.TestCase):
+    """A PR into another change branch is an upper layer of a GitHub stacked PR. Each layer is
+    squash-merged into staging under its own title, so it gets the same rules as a PR into
+    staging would."""
+
+    def test_change_branches_are_stack_bases_and_others_are_not(self):
+        self.assertTrue(is_stack_layer("feature/multi-pet"))
+        self.assertTrue(is_stack_layer("fix/a"))
+        self.assertTrue(is_stack_layer("chore/b"))
+        self.assertTrue(is_stack_layer("feature/multi-pet/phase-1"))
+        for base in ("staging", "alpha", "main", "hotfix/x", "seer/x", "release-notes-draft"):
+            self.assertFalse(is_stack_layer(base), base)
+
+    def test_a_good_layer_passes(self):
+        self.assertEqual([], errors(base="feature/multi-pet-1", head="feature/multi-pet-2",
+                                    title="Added a pet name argument to every pet command"))
+
+    def test_a_nested_branch_name_is_still_a_layer(self):
+        self.assertEqual([], errors(base="feature/multi-pet/phase-1",
+                                    head="feature/multi-pet/phase-2",
+                                    title="Added a pet name argument to every pet command"))
+
+    def test_a_layer_with_a_conventional_title_fails(self):
+        errs = errors(base="feature/a", head="feature/b", title="feat(pets): add pet names")
+        self.assertTrue(any("plain sentence" in e for e in errs), errs)
+
+    def test_a_layer_with_a_bad_commit_fails_and_names_it(self):
+        errs = errors(base="feature/a", head="feature/b", commits=[Commit("c3ffee0", "WIP", 1)])
+        self.assertTrue(any("c3ffee0" in e for e in errs), errs)
+
+    def test_a_layer_needs_the_siblings_section(self):
+        errs = errors(base="fix/a", head="fix/b", body="no section here")
+        self.assertTrue(any("Siblings" in e for e in errs), errs)
+
+    def test_a_layer_head_must_be_a_change_branch(self):
+        errs = errors(base="feature/a", head="wip-b")
+        self.assertTrue(any("must start with" in e for e in errs), errs)
+
+    def test_a_chore_layer_follows_the_chore_title_rules(self):
+        self.assertEqual([], errors(base="feature/a", head="chore/b",
+                                    title="Tidied the test harness [skip ci]"))
+        self.assertTrue(errors(base="feature/a", head="chore/b", title="Tidied the harness"))
 
 
 class Commits(unittest.TestCase):
@@ -179,6 +225,70 @@ class Changelog(unittest.TestCase):
         self.assertEqual([], errors(changelog=None))
 
 
+class ChangelogFragments(unittest.TestCase):
+    """Where the next version is a directory, a player-facing PR adds its own fragment: the
+    section, then its title."""
+    TITLE = "Fixed Enderman pets taking damage in rain"
+    PATH = ".github/changelogs/4.1.0/fix-drowning.txt"
+
+    def ctx(self, files):
+        return ChangelogContext("4.1.0", list(files), True, files.get)
+
+    def test_a_matching_fragment_passes(self):
+        self.assertEqual([], errors(changelog=self.ctx({self.PATH: f"Fixed\n{self.TITLE}\n"})))
+
+    def test_a_missing_fragment_fails_and_names_its_path(self):
+        errs = errors(changelog=self.ctx({}))
+        self.assertTrue(any(self.PATH in e for e in errs), errs)
+
+    def test_editing_the_old_single_file_does_not_count(self):
+        errs = errors(changelog=self.ctx({".github/changelogs/4.1.0.bbcode": "x"}))
+        self.assertTrue(any(self.PATH in e for e in errs), errs)
+
+    def test_a_line_that_differs_from_the_title_fails_and_quotes_both(self):
+        errs = errors(changelog=self.ctx({self.PATH: "Fixed\nFixed something else\n"}))
+        self.assertTrue(any("Fixed something else" in e and self.TITLE in e for e in errs), errs)
+
+    def test_an_unknown_section_fails(self):
+        errs = errors(changelog=self.ctx({self.PATH: f"Improved\n{self.TITLE}\n"}))
+        self.assertTrue(any("Improved" in e for e in errs), errs)
+
+    def test_a_one_line_fragment_fails(self):
+        self.assertTrue(errors(changelog=self.ctx({self.PATH: f"{self.TITLE}\n"})))
+
+    def test_a_deleted_fragment_fails(self):
+        files = {self.PATH: None}
+        errs = errors(changelog=ChangelogContext("4.1.0", [self.PATH], True, files.get))
+        self.assertTrue(any("could not be read" in e for e in errs), errs)
+
+    def test_crlf_and_blank_lines_are_tolerated(self):
+        text = f"\r\nFixed\r\n\r\n{self.TITLE}\r\n\r\n"
+        self.assertEqual([], errors(changelog=self.ctx({self.PATH: text})))
+
+    def test_trailing_spaces_in_the_title_are_ignored(self):
+        self.assertEqual([], errors(title=self.TITLE + "  ",
+                                    changelog=self.ctx({self.PATH: f"Fixed\n{self.TITLE}\n"})))
+
+    def test_every_slash_in_a_branch_becomes_a_dash(self):
+        self.assertEqual("feature-multi-pet-phase-1.txt", fragment_name("feature/multi-pet/phase-1"))
+
+    def test_a_stack_layer_needs_its_own_fragment(self):
+        path = ".github/changelogs/4.1.0/feature-b.txt"
+        title = "Added a pet name argument to every pet command"
+        self.assertEqual([], errors(base="feature/a", head="feature/b", title=title,
+                                    changelog=self.ctx({path: f"Added\n{title}\n"})))
+        self.assertTrue(errors(base="feature/a", head="feature/b", title=title,
+                               changelog=self.ctx({})))
+
+    def test_chores_are_exempt(self):
+        self.assertEqual([], errors(head="chore/harness", title="Updated the harness [skip ci]",
+                                    changelog=self.ctx({})))
+
+    def test_parse_fragment_returns_section_and_line(self):
+        self.assertEqual(("Removed", "Removed the /petold command"),
+                         parse_fragment("Removed\nRemoved the /petold command\n"))
+
+
 class PlayerFacing(unittest.TestCase):
     def test_skip_ci_anywhere_marks_a_commit_non_player_facing(self):
         self.assertFalse(is_player_facing("Updated the test harness [skip ci] (#45)"))
@@ -250,6 +360,18 @@ class SiblingPullRequests(unittest.TestCase):
         self.assertEqual("s", token_from_env({"SIBLINGS_TOKEN": "s", "GITHUB_TOKEN": "g"}))
         self.assertEqual("g", token_from_env({"SIBLINGS_TOKEN": "", "GITHUB_TOKEN": "g"}))
         self.assertEqual("", token_from_env({}))
+
+    def test_a_layers_sibling_is_looked_up_against_the_layers_base(self):
+        get, calls = self.stub(200, [{"number": 9}])
+        self.assertIsNone(sibling_pr_problem("MyPetORG/MyPet-Wiki", "feature/b", get,
+                                             base="feature/a"))
+        self.assertEqual(["https://api.github.com/repos/MyPetORG/MyPet-Wiki/pulls"
+                          "?head=MyPetORG%3Afeature%2Fb&base=feature%2Fa&state=all"], calls)
+
+    def test_a_missing_layer_sibling_names_the_base_it_should_target(self):
+        get, _ = self.stub(200, [])
+        problem = sibling_pr_problem("MyPetORG/MyPet-Wiki", "feature/b", get, base="feature/a")
+        self.assertIn("into `feature/a`", problem)
 
 
 if __name__ == "__main__":

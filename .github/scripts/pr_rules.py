@@ -22,6 +22,10 @@ Into `staging`, a change PR must:
 Into `alpha` only `staging` (promotion) or `main` (merge-back) may come; into `main` only `alpha`
 (promotion) or a `hotfix/` branch, which follows the change-PR rules above.
 
+A PR into another `fix/`, `feature/` or `chore/` branch is a layer of a GitHub stacked PR. It
+follows the change-PR rules above, and its named siblings must have a PR from the same branch into
+the layer's base rather than into `staging`.
+
 Run in CI by .github/workflows/pr-rules.yml; tested by test_pr_rules.py. The same file is copied
 into every MyPet repo; keep the copies identical.
 """
@@ -41,6 +45,7 @@ EXEMPT_COMMIT = re.compile(r'^(Revert "|fixup! |squash! |amend! )')
 BRANCH_NAME = r"[a-z0-9][a-z0-9._/-]*"
 SKIP_CI = "[skip ci]"
 NON_PLAYER_FACING_SUBJECT = re.compile(r"^(chore|build|ci|test|docs)(\([^)]+\))?!?: ")
+CHANGE_BRANCH = re.compile(r"(fix|feature|chore)/" + BRANCH_NAME)
 
 # The display names used in the Siblings section, keyed by GitHub repository.
 REPOS = {
@@ -73,8 +78,50 @@ def is_player_facing(subject: str) -> bool:
     return SKIP_CI not in subject and not NON_PLAYER_FACING_SUBJECT.match(subject)
 
 
-# (next release version, files the PR changes); None where the repo computes no versions.
-Changelog = Optional[Tuple[str, List[str]]]
+def is_stack_layer(base: str) -> bool:
+    """Whether a PR into `base` is an upper layer of a GitHub stacked PR.
+
+    A stack's bottom PR targets staging; every layer above it targets the branch below. Each
+    layer is later squash-merged into staging under its own title, so a layer is held to exactly
+    the rules a PR into staging is — otherwise its title, commits and notes would land unchecked.
+    """
+    return bool(CHANGE_BRANCH.fullmatch(base))
+
+
+CHANGELOG_DIR = ".github/changelogs"
+SECTIONS = ("Added", "Changed", "Fixed", "Removed")
+
+
+class ChangelogContext(NamedTuple):
+    """The next release version, the files the PR changes, whether that version's notes are a
+    directory of fragments, and a reader for a file at the PR's head (None when absent)."""
+    version: str
+    changed: List[str]
+    directory: bool = False
+    read: Callable[[str], Optional[str]] = lambda path: None
+
+
+# None where the repo computes no versions. A plain (version, changed) tuple is the single-file
+# form and is still accepted.
+Changelog = Optional[object]
+
+
+def fragment_name(branch: str) -> str:
+    """The fragment file a change branch writes: `feature/multi-pet/phase-1` becomes
+    `feature-multi-pet-phase-1.txt`."""
+    return branch.replace("/", "-") + ".txt"
+
+
+def parse_fragment(text: str) -> Tuple[str, str]:
+    """(section, change) from a fragment's two non-blank lines; ValueError says what is wrong."""
+    lines = [line.strip() for line in text.replace("\r", "").split("\n") if line.strip()]
+    if len(lines) != 2:
+        raise ValueError(f"a fragment is two lines, the section and then the change; this one has "
+                         f"{len(lines)}")
+    section, change = lines
+    if section not in SECTIONS:
+        raise ValueError(f"the first line must be one of {', '.join(SECTIONS)}, not `{section}`")
+    return section, change
 
 
 def check(base: str, head: str, title: str, body: str, commits: List[Commit],
@@ -112,6 +159,13 @@ def check(base: str, head: str, title: str, body: str, commits: List[Commit],
                     f"(lowercase, e.g. `fix/pet-drowning`)."]
         return change_rules(match.group(1), head, title, body, commits, repo, sibling_problem,
                             changelog)
+    if is_stack_layer(base):
+        match = CHANGE_BRANCH.fullmatch(head)
+        if not match:
+            return [f"The branch `{head}` must start with `fix/`, `feature/` or `chore/` "
+                    f"(lowercase, e.g. `fix/pet-drowning`)."]
+        return change_rules(match.group(1), head, title, body, commits, repo, sibling_problem,
+                            changelog)
     return []
 
 
@@ -120,24 +174,45 @@ def change_rules(kind: str, head: str, title: str, body: str, commits: List[Comm
                  changelog: Changelog = None) -> List[str]:
     return (commit_rules(commits) + title_rules(kind, title)
             + sibling_rules(head, body, repo, sibling_problem)
-            + changelog_rules(kind, changelog))
+            + changelog_rules(kind, changelog, head, title))
 
 
-def changelog_rules(kind: str, changelog: Changelog) -> List[str]:
-    """A player-facing change must add its line to the next release's changelog.
+def changelog_rules(kind: str, changelog: Changelog, head: str = "",
+                    title: str = "") -> List[str]:
+    """A player-facing change must add its line to the next release's notes.
 
     The release notes are written in the PRs that make the changes, so a release never ships notes
     written before its newest fix (and nothing has to write them afterwards). Chores are exempt:
-    they never appear in a changelog.
+    they never appear in a changelog. In the directory form each PR writes its own fragment, so two
+    PRs for one version never touch the same file and never conflict.
     """
     if changelog is None or kind == "chore":
         return []
-    version, changed = changelog
-    path = f".github/changelogs/{version}.bbcode"
-    if path in changed:
-        return []
-    return [f"This PR must add its change to `{path}` (the next release's changelog; create it "
-            f"from the previous release's file if it doesn't exist yet). Chores are exempt."]
+    ctx = changelog if isinstance(changelog, ChangelogContext) else ChangelogContext(*changelog)
+    if not ctx.directory:
+        path = f"{CHANGELOG_DIR}/{ctx.version}.bbcode"
+        if path in ctx.changed:
+            return []
+        return [f"This PR must add its change to `{path}` (the next release's changelog; create "
+                f"it from the previous release's file if it doesn't exist yet). Chores are "
+                f"exempt."]
+    path = f"{CHANGELOG_DIR}/{ctx.version}/{fragment_name(head)}"
+    if path not in ctx.changed:
+        return [f"This PR must add `{path}`: two lines, the section ({', '.join(SECTIONS)}) and "
+                f"then this PR's title. Chores are exempt."]
+    text = ctx.read(path)
+    if text is None:
+        return [f"`{path}` changed but could not be read at the PR's head; the PR must add it, "
+                f"not delete it."]
+    try:
+        _, change = parse_fragment(text)
+    except ValueError as problem:
+        return [f"`{path}`: {problem}."]
+    if change != title.strip():
+        return [f"`{path}` says `{change}`, but the PR title is `{title.strip()}`. They must "
+                f"match: the title becomes the squash commit and the fragment becomes the "
+                f"release note."]
+    return []
 
 
 def commit_rules(commits: List[Commit]) -> List[str]:
@@ -203,11 +278,16 @@ def sibling_rules(head: str, body: str, repo: str,
 
 
 def sibling_pr_problem(sibling: str, branch: str,
-                       get: Callable[[str], Tuple[int, object]]) -> Optional[str]:
-    """Why `sibling` has no PR from `branch` into `staging` (open or merged), or None if it has."""
+                       get: Callable[[str], Tuple[int, object]],
+                       base: str = "staging") -> Optional[str]:
+    """Why `sibling` has no PR from `branch` into `base` (open or merged), or None if it has.
+
+    `base` is staging for an ordinary change PR, and the layer's own base for a stack layer: a
+    sibling of a stacked change is stacked too, on the sibling branch of the same name.
+    """
     owner = sibling.split("/")[0]
     url = (f"https://api.github.com/repos/{sibling}/pulls?"
-           + urllib.parse.urlencode({"head": f"{owner}:{branch}", "base": "staging",
+           + urllib.parse.urlencode({"head": f"{owner}:{branch}", "base": base,
                                      "state": "all"}))
     status, pulls = get(url)
     if status in (401, 403, 404):
@@ -216,7 +296,7 @@ def sibling_pr_problem(sibling: str, branch: str,
     if status != 200:
         return f"Could not look up PRs in {sibling} (HTTP {status or 'error'}); re-run the check."
     if not pulls:
-        return (f"Siblings: {sibling} has no PR from `{branch}` into `staging`. Open it, or "
+        return (f"Siblings: {sibling} has no PR from `{branch}` into `{base}`. Open it, or "
                 f"change that line to `not needed`.")
     return None
 
@@ -256,7 +336,8 @@ VERSION_SCRIPT = ".github/scripts/version.py"
 
 
 def changelog_context(base_sha: str, head_sha: str) -> Changelog:
-    """The next version (computed on the checked-out PR merge, tags included) and the PR's files.
+    """The next version (computed on the checked-out PR merge, tags included), the PR's files,
+    whether that version is a directory at the PR's head, and a reader for files at the head.
 
     None in repos without a version script — only MyPet4 versions its releases this way.
     """
@@ -264,12 +345,32 @@ def changelog_context(base_sha: str, head_sha: str) -> Changelog:
         return None
     result = subprocess.run([sys.executable, VERSION_SCRIPT, "next"], capture_output=True, text=True)
     if result.returncode != 0 or not result.stdout.strip():
+        stderr = result.stderr.strip() or "version.py printed nothing"
+        if result.returncode == 3:
+            advice = ("one version has both a changelog file and a changelog directory — "
+                      "remove one of them.")
+        else:
+            advice = "the checkout needs full history with tags (fetch-depth: 0)."
         raise RuntimeError("Could not compute the next version for the changelog rule: "
-                           + (result.stderr.strip() or "version.py printed nothing") + " — the "
-                           "checkout needs full history with tags (fetch-depth: 0).")
+                           + stderr + " — " + advice)
+    version = result.stdout.strip()
     changed = subprocess.run(["git", "diff", "--name-only", f"{base_sha}...{head_sha}"],
                              check=True, capture_output=True, text=True).stdout.split()
-    return result.stdout.strip(), changed
+    # Check the directory-vs-file form at HEAD (the checked-out PR merge commit), the same
+    # ref version.py just read — not head_sha (the PR branch tip). A branch opened before
+    # the fragments migration landed on staging has no directory at its own tip, but merging
+    # it lands on a HEAD that does; checking head_sha would wrongly let it resurrect the
+    # single-file form instead of being told to write a fragment.
+    entry = subprocess.run(["git", "ls-tree", "HEAD", "--", f"{CHANGELOG_DIR}/{version}"],
+                           check=True, capture_output=True, text=True).stdout
+    directory = " tree " in entry
+
+    def read(path: str) -> Optional[str]:
+        shown = subprocess.run(["git", "show", f"{head_sha}:{path}"], capture_output=True,
+                               text=True)
+        return shown.stdout if shown.returncode == 0 else None
+
+    return ChangelogContext(version, changed, directory, read)
 
 
 def main() -> int:
@@ -284,7 +385,9 @@ def main() -> int:
                    env.get("PR_BODY", ""),
                    commits_between(env["PR_BASE_SHA"], env["PR_HEAD_SHA"]),
                    env.get("GITHUB_REPOSITORY", ""),
-                   lambda sibling, branch: sibling_pr_problem(sibling, branch, get),
+                   lambda sibling, branch: sibling_pr_problem(
+                       sibling, branch, get,
+                       base=env["PR_BASE"] if is_stack_layer(env["PR_BASE"]) else "staging"),
                    changelog)
     for error in errors:
         print(f"::error::{error}")

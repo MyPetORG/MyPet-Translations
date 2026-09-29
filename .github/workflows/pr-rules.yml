@@ -12,7 +12,9 @@ name: PR rules
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
-    branches: [staging, alpha, main]
+    # The change branches are here for GitHub stacked PRs: a layer above the bottom one targets
+    # the branch below it, and pr_rules.py holds it to the change-PR rules (see is_stack_layer).
+    branches: [staging, alpha, main, 'fix/**', 'feature/**', 'chore/**']
 
 permissions:
   contents: read
