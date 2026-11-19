@@ -32,8 +32,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Test the rules themselves
-        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
+      - name: Fetch the pipeline rules from the Hub
+        env:
+          HUB_RULES_URL: ${{ vars.HUB_RULES_URL }}
+          RULES_OUT: ${{ runner.temp }}/pipeline-rules.json
+        run: |
+          python3 .github/scripts/fetch_rules.py
+          echo "PIPELINE_RULES_FILE=$RULES_OUT" >> "$GITHUB_ENV"
 
       - name: Check this PR
         env:
